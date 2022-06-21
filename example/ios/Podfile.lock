@@ -1,0 +1,29 @@
+PODS:
+  - Flutter (1.0.0)
+  - VpadnSDK (5.3.4)
+  - vpon_sdk (0.0.1):
+    - Flutter
+    - VpadnSDK (= 5.3.4)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - vpon_sdk (from `.symlinks/plugins/vpon_sdk/ios`)
+
+SPEC REPOS:
+  trunk:
+    - VpadnSDK
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  vpon_sdk:
+    :path: ".symlinks/plugins/vpon_sdk/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  VpadnSDK: 76a4e9d5e5c8545337818994942934a5c24cd44a
+  vpon_sdk: 77c15de56c5a962169d85c4902022274a00091d5
+
+PODFILE CHECKSUM: 4e8f8b2be68aeea4c0d5beb6ff1e79fface1d048
+
+COCOAPODS: 1.11.3
