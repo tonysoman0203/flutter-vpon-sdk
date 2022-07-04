@@ -53,16 +53,29 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler {
                     override fun onAdClosed() {
                         super.onAdClosed()
                         isShowing = false
+                        result.success("onAdClosed")
                     }
 
                     override fun onAdFailedToLoad(errorCode: Int) {
                         super.onAdFailedToLoad(errorCode)
+
                         isShowing = false
+                        val errorMessage: String = when (errorCode) {
+                            3 -> "ERROR_CODE_NO_FILL"
+                            2 -> "ERROR_CODE_NETWORK_ERROR"
+                            1 -> "ERROR_CODE_INVALID_REQUEST"
+                            0 -> "ERROR_CODE_INTERNAL_ERROR"
+                            else -> "ERROR_CODE_EXCEED_ENDURANCE"
+                        }
+                        Log.d(TAG, "onAdFailedToLoad errorMessage =${errorMessage}")
+
+                        result.error(errorCode.toString(), errorMessage, null)
                     }
 
                     override fun onAdLeftApplication() {
                         super.onAdLeftApplication()
                         isShowing = false
+                        result.success("onAdLeftApplication")
                     }
 
                     override fun onAdLoaded() {
@@ -70,6 +83,7 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler {
                         if (!isShowing) {
                             isShowing = true
                             mVponInterstitialAd?.show()
+                            result.success("onAdLoaded")
                         }
 
                     }
@@ -80,6 +94,7 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler {
             "showVponInterstitialAd" -> {
                 Log.d(TAG, "showVponInterstitialAd! called")
                 mVponInterstitialAd?.loadAd(builder.build())
+                result.success("showVponInterstitialAd!")
             }
             else -> {
                 result.notImplemented()

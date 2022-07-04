@@ -22,14 +22,19 @@ class MethodChannelVponSdk extends VponSdkPlatform {
   }
 
   @override
-  Future<void> createVponInterstitialAd({required String adKey}) async {
-    await methodChannel.invokeMethod("createInterstitialAd", {
-      "adKey": adKey,
-    });
+  Future<dynamic> createVponInterstitialAd({required String adKey}) async {
+    try {
+      return await methodChannel.invokeMethod("createInterstitialAd", {
+        "adKey": adKey,
+      });
+    } on PlatformException catch (e){
+      print("createVponInterstitialAd ! error with e: ${e}");
+      rethrow;
+    }
   }
 
   @override
-  Future<void> showVponInterstitialAd() async {
-    await methodChannel.invokeMethod('showVponInterstitialAd');
+  Future<String> showVponInterstitialAd() async {
+    return await methodChannel.invokeMethod('showVponInterstitialAd');
   }
 }

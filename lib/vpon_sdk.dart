@@ -12,13 +12,13 @@ class VponSdk {
     return VponSdkPlatform.instance.init();
   }
 
-  Future<void> createVponInterstitialAd({required String adKey}) async{
+  Future<dynamic> createVponInterstitialAd({required String adKey}) async{
     return VponSdkPlatform.instance.createVponInterstitialAd(
         adKey: adKey
     );
   }
 
-  Future<void> showVponInterstitialAd() async {
+  Future<String> showVponInterstitialAd() async {
     return VponSdkPlatform.instance.showVponInterstitialAd();
   }
 }

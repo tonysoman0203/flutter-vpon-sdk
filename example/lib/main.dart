@@ -25,7 +25,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     initPlatformState();
     initSdk();
-    createVponInterstitialAd();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -53,7 +52,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> createVponInterstitialAd() async {
     try {
       await _vponSdkPlugin.createVponInterstitialAd(
-          adKey: "8a80854b75ab2b0101761cfb968d71c7",
+          adKey: "8a80854b6a90b5bc016ad81a98cf652e",
       );
     } on PlatformException{
       print("Failed to init");
@@ -62,7 +61,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> showAds() async {
-    await _vponSdkPlugin.showVponInterstitialAd();
+    try {
+      dynamic result = await _vponSdkPlugin.showVponInterstitialAd();
+      print(result);
+    } on PlatformException{
+      print("Failed to showAds");
+    }
   }
 
   Future<void> initSdk() async {
@@ -84,6 +88,8 @@ class _MyAppState extends State<MyApp> {
         body: Column(
           children: [
             Text('Running on: $_platformVersion\n'),
+            ElevatedButton(
+                onPressed: () async => createVponInterstitialAd(), child: Text("Create Vpon Ads!")),
             ElevatedButton(
                 onPressed: () async => showAds(), child: Text("Show Vpon Ads!"))
           ],

@@ -32,11 +32,11 @@ abstract class VponSdkPlatform extends PlatformInterface {
     throw UnimplementedError('init() has not been implemented.');
   }
 
-  Future<void> createVponInterstitialAd({required String adKey}) async {
+  Future<dynamic> createVponInterstitialAd({required String adKey}) async {
     throw UnimplementedError('showVponInterstitialAd() has not been implemented.');
   }
 
-  Future<void> showVponInterstitialAd() async {
+  Future<String> showVponInterstitialAd() async {
     throw UnimplementedError('showVponInterstitialAd() has not been implemented.');
   }
 }
