@@ -33,6 +33,7 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private val builder: VponAdRequest.Builder = VponAdRequest.Builder()
     private var isShowing = false
     private var activity: Activity? = null
+    private var mAdKey: String? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpon_sdk")
@@ -52,64 +53,62 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "createInterstitialAd" -> {
                 val key = call.argument("adKey") as String?
-                if (mVponInterstitialAd == null) {
+
+                if (mVponInterstitialAd == null || mAdKey != key) {
                     mVponInterstitialAd = VponInterstitialAd(pluginContext, key)
+                    mVponInterstitialAd?.setAdListener(object : VponAdListener(){
+                        override fun onAdClosed() {
+                            super.onAdClosed()
+                            isShowing = false
+                        }
+
+                        override fun onAdFailedToLoad(errorCode: Int) {
+                            super.onAdFailedToLoad(errorCode)
+
+                            isShowing = false
+                            val errorMessage: String = when (errorCode) {
+                                3 -> "ERROR_CODE_NO_FILL"
+                                2 -> "ERROR_CODE_NETWORK_ERROR"
+                                1 -> "ERROR_CODE_INVALID_REQUEST"
+                                0 -> "ERROR_CODE_INTERNAL_ERROR"
+                                else -> "ERROR_CODE_EXCEED_ENDURANCE"
+                            }
+                            Log.d(TAG, "onAdFailedToLoad errorMessage =${errorMessage}")
+                        }
+
+                        override fun onAdLeftApplication() {
+                            super.onAdLeftApplication()
+                            isShowing = false
+                        }
+
+                        override fun onAdLoaded() {
+                            super.onAdLoaded()
+                            if (!isShowing) {
+                                isShowing = true
+                                mVponInterstitialAd?.show()
+                            }
+
+                        }
+                    })
+                    loadAds()
+                    mAdKey = key
                 }
-
-                mVponInterstitialAd?.setAdListener(object : VponAdListener(){
-                    override fun onAdClosed() {
-                        super.onAdClosed()
-                        isShowing = false
-                        result.success("onAdClosed")
-                    }
-
-                    override fun onAdFailedToLoad(errorCode: Int) {
-                        super.onAdFailedToLoad(errorCode)
-
-                        isShowing = false
-                        val errorMessage: String = when (errorCode) {
-                            3 -> "ERROR_CODE_NO_FILL"
-                            2 -> "ERROR_CODE_NETWORK_ERROR"
-                            1 -> "ERROR_CODE_INVALID_REQUEST"
-                            0 -> "ERROR_CODE_INTERNAL_ERROR"
-                            else -> "ERROR_CODE_EXCEED_ENDURANCE"
-                        }
-                        Log.d(TAG, "onAdFailedToLoad errorMessage =${errorMessage}")
-
-                        result.error(errorCode.toString(), errorMessage, null)
-                    }
-
-                    override fun onAdLeftApplication() {
-                        super.onAdLeftApplication()
-                        isShowing = false
-                        result.success("onAdLeftApplication")
-                    }
-
-                    override fun onAdLoaded() {
-                        super.onAdLoaded()
-                        if (!isShowing) {
-                            isShowing = true
-                            mVponInterstitialAd?.show()
-                            result.success("onAdLoaded")
-                        }
-
-                    }
-
-                })
+                else {
+                    loadAds()
+                }
             }
 
             "showVponInterstitialAd" -> {
                 Log.d(TAG, "showVponInterstitialAd! called")
-                mVponInterstitialAd?.apply {
-                    loadAd(builder.build())
-                    result.success("showVponInterstitialAd!")
-                }
+                loadAds()
             }
             else -> {
                 result.notImplemented()
             }
         }
     }
+
+    private fun loadAds () = mVponInterstitialAd?.loadAd(builder.build())
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
