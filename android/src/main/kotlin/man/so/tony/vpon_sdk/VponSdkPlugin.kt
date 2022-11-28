@@ -1,6 +1,8 @@
 package man.so.tony.vpon_sdk
 
+import android.app.Activity
 import android.content.Context
+import android.nfc.Tag
 import android.util.Log
 import androidx.annotation.NonNull
 import com.vpon.ads.VponAdListener
@@ -9,31 +11,36 @@ import com.vpon.ads.VponInterstitialAd
 import com.vpon.ads.VponMobileAds
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
 /** VponSdkPlugin */
-class VponSdkPlugin : FlutterPlugin, MethodCallHandler {
+class VponSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
+    companion object {
+        val TAG = VponSdkPlugin::class.simpleName
+    }
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
-    private val TAG = VponSdkPlugin::class.simpleName
     private lateinit var pluginContext: Context
     private var mVponInterstitialAd: VponInterstitialAd? = null
     private val builder: VponAdRequest.Builder = VponAdRequest.Builder()
     private var isShowing = false
+    private var activity: Activity? = null
 
-    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpon_sdk")
         pluginContext = flutterPluginBinding.applicationContext
         channel.setMethodCallHandler(this)
     }
 
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+    override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
             "getPlatformVersion" -> {
                 result.success("Android ${android.os.Build.VERSION.RELEASE}")
@@ -93,8 +100,10 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler {
 
             "showVponInterstitialAd" -> {
                 Log.d(TAG, "showVponInterstitialAd! called")
-                mVponInterstitialAd?.loadAd(builder.build())
-                result.success("showVponInterstitialAd!")
+                mVponInterstitialAd?.apply {
+                    loadAd(builder.build())
+                    result.success("showVponInterstitialAd!")
+                }
             }
             else -> {
                 result.notImplemented()
@@ -102,7 +111,23 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+    }
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activity = binding.activity
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        activity = null
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        activity = binding.activity
+    }
+
+    override fun onDetachedFromActivity() {
+        activity = null
     }
 }
