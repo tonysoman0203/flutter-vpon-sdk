@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:vpon_sdk/Datamodel/VponAdListener.dart';
+import 'package:vpon_sdk/Datamodel/VponInterstitialAd.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
-import 'package:vpon_sdk/callback/ad_listener.dart';
-import 'package:vpon_sdk/vpon_sdk.dart';
+import 'package:vpon_sdk/vponsdk.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,81 +17,76 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  final _vponSdkPlugin = VponSdk();
+
+  VponInterstitialAd? interstitialAd;
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-    initSdk();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await _vponSdkPlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+    vponSDK.init();
+    interstitialAd = VponInterstitialAd(
+        licenseKey: "8a80854b6a90b5bc016ad81a98cf652e",
+        platform: "TW",
+        // testAd: true,
+        eventListener: VponAdListener(
+            onAdLoaded: () {
+              print("Ad Loaded");
+            },
+            onAdOpened: () {
+              print("Ad Opened");
+            },
+            onAdClosed: () {
+              print("Ad Colsed");
+            },
+            onAdClicked: () {
+              print("Ad Clicked");
+            },
+            onAdFailedToLoad: (dynamic error) {
+              print("Ad Error : $error");
+            },
+            onAdLeftApplication: () {
+              print("Ad Left App");
+            }
+        )
+    );
   }
 
   Future<void> createVponInterstitialAd() async {
     try {
-      await _vponSdkPlugin.createVponInterstitialAd(
-          adKey: "8a80854b6a90b5bc016ad81a98cf652e",
-      );
-    } on PlatformException{
-      print("Failed to init");
+      await vponSDK.loadVponInterstitialAd(interstitialAd: interstitialAd!);
+    } catch (error) {
+      print(error);
     }
     if (!mounted) return;
   }
 
   Future<void> showAds() async {
+    print("show");
     try {
-      dynamic result = await _vponSdkPlugin.showVponInterstitialAd();
-      print(result);
-    } on PlatformException{
+      await vponSDK.showVponInterstitialAd(interstitialAd: interstitialAd!);
+    } catch (error) {
+      print(error);
       print("Failed to showAds");
     }
   }
 
-  Future<void> initSdk() async {
-    try {
-      await _vponSdkPlugin.initSdk();
-    } on PlatformException{
-      print("Failed to init");
-    }
-    if (!mounted) return;
-  }
-  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Vpon SDK Example'),
         ),
         body: Column(
           children: [
-            Text('Running on: $_platformVersion\n'),
             ElevatedButton(
-                onPressed: () async => createVponInterstitialAd(), child: Text("Create Vpon Ads!")),
+                onPressed: () async => createVponInterstitialAd(),
+                child: Text("Create Vpon Ads!")
+            ),
             ElevatedButton(
-                onPressed: () async => showAds(), child: Text("Show Vpon Ads!"))
+                onPressed: () async => showAds(),
+                child: Text("Show Vpon Ads!")
+            )
           ],
         ),
       ),

@@ -1,6 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:vpon_sdk/Datamodel/VponInterstitialAd.dart';
 
-import 'package:vpon_sdk/callback/ad_listener.dart';
 import 'vpon_sdk_method_channel.dart';
 
 abstract class VponSdkPlatform extends PlatformInterface {
@@ -9,13 +9,13 @@ abstract class VponSdkPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static VponSdkPlatform _instance = MethodChannelVponSdk();
+  static VponSdkPlatform _instance = VponSDK();
 
   /// The default instance of [VponSdkPlatform] to use.
   ///
-  /// Defaults to [MethodChannelVponSdk].
+  /// Defaults to [VponSDK].
   static VponSdkPlatform get instance => _instance;
-  
+
   /// Platform-specific implementations should set this with their own
   /// platform-specific class that extends [VponSdkPlatform] when
   /// they register themselves.
@@ -24,19 +24,19 @@ abstract class VponSdkPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
-
   Future<void> init() async {
     throw UnimplementedError('init() has not been implemented.');
   }
 
-  Future<dynamic> createVponInterstitialAd({required String adKey}) async {
+  Future<void> loadVponInterstitialAd({
+    required VponInterstitialAd interstitialAd
+  }) async {
     throw UnimplementedError('showVponInterstitialAd() has not been implemented.');
   }
 
-  Future<String> showVponInterstitialAd() async {
+  Future<void> showVponInterstitialAd({
+    required VponInterstitialAd interstitialAd
+  }) async {
     throw UnimplementedError('showVponInterstitialAd() has not been implemented.');
   }
 }

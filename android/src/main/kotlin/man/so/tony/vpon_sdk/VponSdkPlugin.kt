@@ -43,9 +43,6 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
-            "getPlatformVersion" -> {
-                result.success("Android ${android.os.Build.VERSION.RELEASE}")
-            }
             "init" -> {
                 VponMobileAds.initialize(pluginContext)
                 Log.d(TAG, "init Vpon Success")
