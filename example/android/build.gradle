@@ -3,6 +3,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        flatDir {
+            dirs project(':vpon_sdk').file('libs')
+            // e.g. dirs project(':url_launcher').file('libs')  - don't miss the ':'
+        }
     }
 
     dependencies {
@@ -17,6 +21,10 @@ allprojects {
         mavenCentral()
         maven{
             url 'https://m.vpon.com/sdk/android/maven'
+        }
+        flatDir {
+            dirs project(':vpon_sdk').file('libs')
+            // e.g. dirs project(':url_launcher').file('libs')  - don't miss the ':'
         }
     }
 }
