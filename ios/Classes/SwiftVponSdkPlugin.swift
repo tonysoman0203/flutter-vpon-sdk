@@ -40,8 +40,8 @@ public class SwiftVponSdkPlugin: NSObject, FlutterPlugin {
     func loadVponInterstitialAd(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if  let adId: Int = (call.arguments as? [String: Any])?["adId"] as? Int,
             let licenseKey: String = (call.arguments as? [String: Any])?["licenseKey"] as? String,
-           let platform: String? = (call.arguments as? [String: Any])?["platform"] as? String?,
-           let testAd: Bool? = (call.arguments as? [String: Any])?["testAd"] as? Bool?
+            let platform: String? = (call.arguments as? [String: Any])?["platform"] as? String?,
+            let testAd: Bool? = (call.arguments as? [String: Any])?["testAd"] as? Bool?
         {
             let interstitialAd: VpadnInterstitial = VpadnInterstitial(licenseKey: licenseKey)
             interstitialAd.delegate = self
