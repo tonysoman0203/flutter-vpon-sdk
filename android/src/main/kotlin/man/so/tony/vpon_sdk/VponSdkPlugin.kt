@@ -72,9 +72,11 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             if (licenseKey != null) {
                 var interstitialAd = VponInterstitialAd(pluginContext, licenseKey);
                 var requestBuilder = VponAdRequest.Builder()
-                if (testAd) {
-                    requestBuilder.addTestDevice(AdvertisingIdClient.getAdvertisingIdInfo(pluginContext).id)
-                }
+
+                // Cannot get GAID from main thread, no impact to production.
+//                if (testAd) {
+//                    requestBuilder.addTestDevice(AdvertisingIdClient.getAdvertisingIdInfo(pluginContext).id)
+//                }
                 interstitialAd.setAdListener(object: VponAdListener() {
                     override fun onAdClosed() {
                         channel.invokeMethod("onVponInterstitialClosed", mapOf<String, Any>(
@@ -133,7 +135,7 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 })
                 vponInterstitialAds[adId] = interstitialAd
                 interstitialAd.loadAd(builder.build())
-                result.success(null)
+                result.success(true)
             } else {
                 result.error("1", "adId or licenseKey not provided", null)
             }
@@ -148,7 +150,7 @@ class VponSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             if (vponInterstitialAds.keys.contains(adId)) {
                 vponInterstitialAds[adId]?.show()
-                result.success(null)
+                result.success(true)
             } else {
                 result.error("2", "ad not found", null)
             }
