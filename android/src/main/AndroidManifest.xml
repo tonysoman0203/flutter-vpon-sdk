@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="man.so.tony.vpon_sdk">
-
+    <application
+        android:networkSecurityConfig="@xml/network_security_config"/>
 </manifest>
