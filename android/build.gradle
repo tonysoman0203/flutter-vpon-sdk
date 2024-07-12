@@ -49,7 +49,7 @@ android {
 }
 
 dependencies {
-    def vpon_sdk_version = '5.4.2'
+    def vpon_sdk_version = '5.6.6'
     def retrofit_version = '2.8.2'
     def play_services_appset_version = '16.0.2'
     def play_services_ads_identifier_version = '18.0.1'
